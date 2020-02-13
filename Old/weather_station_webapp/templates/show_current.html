@@ -1,0 +1,55 @@
+{% extends "layout.html" %}
+
+{% block scripts %}
+  {% if data %}
+    <script type="text/javascript">
+      google.load('visualization', '1.0', {'packages':['gauge']});
+      google.setOnLoadCallback(drawAllCharts);
+
+      function drawChart(id, label, val, val_from, val_to, major_ticks_list) {
+        var data = google.visualization.arrayToDataTable([
+          ['Label', 'Value'],
+          [label, val]
+        ]);
+
+        var options = {
+          min: val_from, max: val_to,
+          minorTicks: 5, majorTicks: major_ticks_list
+        };
+
+        var gauge = new google.visualization.Gauge(document.getElementById(id));
+        gauge.draw(data, options);
+      }
+
+      function drawAllCharts() {
+        gaugelabels = ['0', '10', '20', '30', '40', '50', '60', '70', '80', '90', '100'];
+        drawChart('avg_wind_gauge', 'Avg. Wind Speed', {{ data.average_wind_speed  }}, 0, 100, gaugelabels);
+        gaugelabels = ['0', '100', '200', '300', '400', '500', '600', '700', '800', '900', '1000'];
+        drawChart('light_level_gauge', 'Light Level', {{ data.light_level  }}, 0, 1000, gaugelabels);
+        gaugelabels = ['-40', '-30', '-20', '-10', '0', '10', '20', '30', '40', '50', '60', '70', '80'];
+        drawChart('temperature_gauge', 'Temperature', {{ data.temperature }}, -40, 80, gaugelabels);
+        gaugelabels = ['0', '10', '20', '30', '40', '50', '60', '70', '80', '90', '100'];
+        drawChart('humidity_gauge', 'Humidity', {{ data.humidity  }}, 0, 100, gaugelabels);        
+        gaugelabels = ['700', '800', '900', '1000', '1100', '1200', '1300'];
+        drawChart('pressure_gauge', 'Pressure', {{ data.pressure  }}, 700, 1300, gaugelabels);
+        gaugelabels = ['0', '10', '20', '30', '40', '50'];
+        drawChart('rain_gauge', 'Rain', {{ data.rain_frequency  }}, 0, 50, gaugelabels);
+      }
+    </script>
+  {% endif %}
+{% endblock %}
+
+{% block body %}
+  {% if data %}
+    <p>Data recorded at: {{ data.timestamp }}</p>
+    <p>Wind direction: {{ data.wind_direction }}</p>
+    <div id="temperature_gauge" class="small_gauge"></div>
+    <div id="humidity_gauge" class="small_gauge"></div>
+    <div id="pressure_gauge" class="small_gauge"></div>
+    <div id="avg_wind_gauge" class="small_gauge"></div>
+    <div id="light_level_gauge" class="small_gauge"></div>
+    <div id="rain_gauge" class="small_gauge"></div>
+  {% else %}
+    <em>No data recorded yet.</em>
+  {% endif %}
+{% endblock %}
